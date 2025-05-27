@@ -48,7 +48,7 @@ class Account:
 
         new_balance = current_balance - amount
         self.transactions.append(("Withdrawal", amount, new_balance))
-        return f"Withdrawal successful. New balance: ${New:.2f}"
+        return f"Withdrawal successful. New balance: ${new_balance:.2f}"
     
         
 
@@ -71,7 +71,7 @@ class Account:
         target_new_balance = target_account._get_current_balance() + amount
 
         target_account.transactions.append(("Transfer In", amount, target_new_balance))
-        return f"Transfer of ${amount:.2f}to {target_account.owner_name} successful"
+        return f"Transfer of ${amount:.2f} to {target_account.owner_name} successful"
 
     def get_balance(self):
         return self._get_current_balance()
@@ -82,10 +82,10 @@ class Account:
         if not isinstance(amount, (int, float)) or amount <= 0:
             return "Loan amount must be a positive number."
 
-            self.loans.append((amount, amount))
-            new_balance = self._get_current_balance() + amount
-            self.transactions.append(("Loan", amount, new_balance))
-            return f"Loan  of ${amount:.2f} registered and approved. New balance: ${self._get_current_balance():.2f}"
+        self.loans.append((amount, amount))
+        new_balance = self._get_current_balance() + amount
+        self.transactions.append(("Loan", amount, new_balance))
+        return f"Loan  of ${amount:.2f} registered and approved. New balance: ${new_balance:.2f}"
 
     def repay_loan(self, amount):
         if self.is_frozen:
@@ -107,18 +107,18 @@ class Account:
         # if amount > remaining_debt:
         #     return f"Insufficient funds to repay loan. Current balance: ${current_balance:.2f}"
 
-       new_loans = []
-       for original, remaining iin self.loans:
-        if repaid_amount == 0:
-            new_loans.append((original, remaining))
-        elif repaid_amount >= remaining:
-            repaid_amount -= remaining
-        else:
-            new_loans.append((original, remaining - repaid_amount))
-            remaining_amount = 0
-       self.loans = new_loans
+        new_loans = []
+        for original, remaining in self.loans:
+            if repaid_amount == 0:
+                new_loans.append((original, remaining))
+            elif repaid_amount >= remaining:
+                repaid_amount -= remaining
+            else:
+                new_loans.append((original, remaining - repaid_amount))
+                repaid_amount = 0
+            self.loans = new_loans
 
-       return f"Loan repayment of ${amount:.2f} successful. Remaining debt: ${sum(l[1] for l in self.loans):.2f}"
+            return f"Loan repayment of ${amount:.2f} successful. Remaining debt: ${sum(l[1] for l in self.loans):.2f}"
        
 
     def view_account_details(self):
@@ -136,11 +136,11 @@ class Account:
     def change_account_owner(self, new_owner_name):
         if not isinstance(new_owner_name, str) or not new_owner_name:
             return "New owner name must be a non-empty string."
-        self.owner_name new_owner_name
+        self.owner_name = new_owner_name
         return f"Account owner changed to : {self.owner_name}"
             
     def account_statement(self):
-        statement = f"___Account Statement for Account___ {self.account_number}___\n")
+        statement = f"___Account Statement for Account___ {self.account_number}___\n"
         statement += f"Owner: {self.owner_name}\n"
         statement += f"{'Type':<15} {'Amount':<10} {'Balance After':<15}\n".format("Type", "Amount", "Balance After")
         statement += "-"*45 +"\n"
@@ -175,14 +175,15 @@ class Account:
     def unfreeze_account(self):
         if not self.is_frozen:
             return "Account is not frozen."
-        self.is_frozen = Falsereturn "Account has been unfrozen."
+        self.is_frozen = False
+        return "Account has been unfrozen."
 
     def set_minimum_balance(self, amount):
         if not isinstance(amount, (int,float)) or amount < 0:
             return "Mimimum balance must be a non-negative number."
             
         self.minimum_balance = amount
-        return f"Minimum balance set to: ${self.amount:.2f}"
+        return f"Minimum balance set to: ${self.minimum_balance:.2f}"
 
     def close_account(self):
         if self.is_frozen:
@@ -194,3 +195,81 @@ class Account:
         self.is_frozen = True
         self.minimum_balance = 0
         return f"Account {self.account_number} has been closed."
+
+
+
+
+        #SCRIPT TO TEST ACCOUNT CLASS AND METHODS
+#>>> from accounts import Account
+#>>> acc1 = Account("12345", "Jane Gitau", initial_balance = 900)
+#>>> acc2 = Account("6789", "Peter Njau", initial_balance=100)
+#>>> print(acc1.deposit(100))
+#Deposit successful. New balance: $1000.00
+#>>> print(acc1.withdraw(300))
+#Withdrawal successful. New balance: $700.00
+#>>> print(acc1.transfer_funds(acc2, 250))
+#Transfer of $250.00 to Peter Njau successful
+#>>> print(acc1.request_loan(300))
+#Loan  of $300.00 registered and approved. New balance: $750.00
+#>>> print(acc1.repay_loan(90))
+#Loan repayment of $90.00 successful. Remaining debt: $210.00
+#>>> print(acc1.interest_calculation())
+#33.00 applied. New balance: $693.00
+#>>> print(acc1.freeze_account())
+#Account has been frozen
+#>>> print(acc1.deposit(500))
+#Account is frozen. Deposit not allowed.
+#>>> print(acc1.unfreeze_account())
+#Account has been unfrozen.
+#>>> print(acc1.unfreeze_account())
+#Account is not frozen.
+#>>> print(acc1.deposit(50))
+#Deposit successful. New balance: $743.00
+#>>> print(acc1.change_account_owner("Jennifer Chinyere"))
+#Account owner changed to : Jennifer Chinyere
+#>>> acc1.owner_name
+#'Jennifer Chinyere'
+#>>> print(acc1.set_minimum_balance(100))
+#Minimum balance set to: $100.00
+#>>> print(acc1.account_statement())
+#___Account Statement for Account___ 12345___
+#Owner: Jennifer Chinyere
+#Type            Amount     Balance After  
+#---------------------------------------------
+#---------------------------------------------
+#---------------------------------------------
+#---------------------------------------------
+#---------------------------------------------
+#---------------------------------------------
+#---------------------------------------------
+#---------------------------------------------
+#---------------------------------------------
+#Current Balance: $743.00
+#___End of statement__
+#>>> print(acc1.close_account())
+#Account 12345 has been closed.
+#>>> print(acc1.deposit(50))
+#Account is frozen. Deposit not allowed.
+#>>> print(acc1.unfreeze_account())
+#Account has been unfrozen.
+#>>> print(acc1.unfreeze_account())
+#Account is not frozen.
+#>>> print(acc1.deposit(50))
+#Deposit successful. New balance: $50.00
+#>>> print("\n" + acc1.view_account_details())
+
+#Account Number: 12345
+#Account Owner: None
+#Current Balance: 50.00
+#Account Status: Active
+#Minimum Balance Required: $0.00
+
+#>>> print("\n" + acc2.view_account_details())
+
+#Account Number: 6789
+#Account Owner: Peter Njau
+#Current Balance: 350.00
+#Account Status: Active
+#Minimum Balance Required: $0.00
+
+>>> 
